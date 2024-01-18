@@ -1,0 +1,42 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=sonoii
+      - POSTGRES_PASSWORD=12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  spark-master:
+    image: bitnami/spark:latest
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=sonoii
+      - POSTGRES_PASSWORD=12345
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  spark-worker1:
+    image: bitnami/spark:latest
+    environment:
+      -SPARK_MASTER_HOST: spark-master
+    depends_on:
+      - spark-master
+
+  spark-worker2:
+    image: bitnami/spark:latest
+    environment:
+      -SPARK_MASTER_HOST: spark-master
+    depends_on:
+      - spark-master
+
